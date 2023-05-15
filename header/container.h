@@ -1,6 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
+#include <vtkSmartPointer.h>
+#include <vtkImageData.h>
+
 #include "./const.h"
 #include "./options.h"
 #include "./physics.h"
@@ -38,6 +41,7 @@ public:
   void Step();
   void Render(sf::RenderWindow &win, Color color);
   void FadeDensity(int size);
+  void toVTK(vtkSmartPointer<vtkImageData> vti);
 
   sf::Color Hsv(int hue, float sat, float val, float d);
 };

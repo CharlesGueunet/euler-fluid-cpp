@@ -1,9 +1,12 @@
 #include "../header/sim.h"
 #include <iostream>
 
+#include <vtkXMLImageDataWriter.h>
+
 const int Sim::numParticles = 10;
 
 Sim::Sim() : options(Options()), container(Container(0.2f, 0, 0.0000001f)) {
+  this->vti = vtkSmartPointer<vtkImageData>::New();
   this->win.create(sf::VideoMode(SIZE * SCALE, SIZE * SCALE),
                    "Euler fluid simulation - Github: "
                    "https://github.com/driema/euler-fluid-cpp",
@@ -40,9 +43,10 @@ void Sim::Run() {
       }
     }
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
       this->container.AddDensity(currentMouse.y / SCALE, currentMouse.x / SCALE,
                                  200);
+    }
 
     currentMouse = sf::Mouse::getPosition(this->win);
 
@@ -57,6 +61,17 @@ void Sim::Run() {
     this->container.Step();
     this->container.Render(this->win, this->options.GetColor());
     this->container.FadeDensity(SIZE * SIZE);
+
+    this->container.toVTK(this->vti);
+
+    if (this->ItNumber % 10 == 0) { // here we chose the stride
+      auto w = vtkSmartPointer<vtkXMLImageDataWriter>::New();
+      w->SetInputData(this->vti);
+      std::string fileName = "out_" + std::to_string(this->ItNumber) + ".vti";
+      w->SetFileName(fileName.c_str());
+      w->Write();
+    }
+    this->ItNumber++;
 
     this->win.display();
   }

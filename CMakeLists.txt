@@ -8,9 +8,16 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(SFML COMPONENTS graphics window system REQUIRED)
+# Sources and executable
 
 set(SOURCES src/container.cpp src/ix.cpp src/options.cpp src/physics.cpp src/sim.cpp src/main.cpp)
-
 add_executable(Euler ${SOURCES})
+
+# Dependencies
+
+find_package(SFML COMPONENTS graphics window system REQUIRED)
 target_link_libraries(Euler sfml-graphics sfml-window sfml-system)
+
+find_package(VTK COMPONENTS CommonCore IOXML REQUIRED)
+target_link_libraries(Euler VTK::CommonCore VTK::IOXML)
+

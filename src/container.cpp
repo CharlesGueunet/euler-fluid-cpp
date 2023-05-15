@@ -1,5 +1,7 @@
 #include "../header/container.h"
 #include <iostream>
+#include <vtkAOSDataArrayTemplate.h>
+#include <vtkPointData.h>
 
 int IX(int x, int y, int N);
 
@@ -145,5 +147,31 @@ void Container::FadeDensity(int size) {
   for (int i = 0; i < size; i++) {
     float d = this->density[i];
     density[i] = (d - 0.05f < 0) ? 0 : d - 0.05f;
+  }
+}
+
+void Container::toVTK(vtkSmartPointer<vtkImageData> img) {
+  if (img->GetLength() == 0) { // executed once
+    img->SetDimensions(this->size, this->size, 1);
+
+    // density arr (0-copy)
+    auto density = vtkSmartPointer<vtkAOSDataArrayTemplate<float>>::New();
+    density->SetName("density");
+    density->SetNumberOfComponents(1);
+    density->SetArray(this->density, this->size * this->size, true);
+    img->GetPointData()->AddArray(density);
+
+    // velocity x & y arr (0-copy)
+    auto vx = vtkSmartPointer<vtkAOSDataArrayTemplate<float>>::New();
+    vx->SetName("vx");
+    vx->SetNumberOfComponents(1);
+    vx->SetArray(this->x, this->size * this->size, true);
+    img->GetPointData()->AddArray(vx);
+
+    auto vy = vtkSmartPointer<vtkAOSDataArrayTemplate<float>>::New();
+    vy->SetName("vy");
+    vy->SetNumberOfComponents(1);
+    vy->SetArray(this->y, this->size * this->size, true);
+    img->GetPointData()->AddArray(vy);
   }
 }
