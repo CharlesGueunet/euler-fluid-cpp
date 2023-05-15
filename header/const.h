@@ -1,2 +1,2 @@
-const int SIZE = 70;
+const int SIZE = 120;
 const int SCALE = 8;
